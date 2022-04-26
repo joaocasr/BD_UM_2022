@@ -28,7 +28,6 @@ CREATE TABLE IF NOT EXISTS agileDB.Colaborador (
 )
 	ENGINE = InnoDB;
 
-
 /*
 ALTER TABLE colaborador,
 	DROP COLUMN 'anos_na_empresa'
@@ -49,29 +48,10 @@ CREATE TABLE IF NOT EXISTS agileDB.Projeto (
 		PRIMARY KEY(IDprojeto)
 );
 
-CREATE TABLE IF NOT EXISTS Product_Increment (
-    PIID INT NOT NULL,
-    Título VARCHAR(15),
-    tempo_restante VARCHAR(30),
-    fk_Projeto_IDprojeto INT,
-		PRIMARY KEY(PIID),
-		FOREIGN KEY(fk_Projeto_IDprojeto) REFERENCES agileDB.Projeto_Backlog(IDprojeto)
-);
-
 -- -------------------------------------------------------------------------------------
--- Table `Sprint` - Tabela de um sprint 
+-- Table `Backlog` - Tabela de um backlog 
 -- -------------------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS Sprint (
-    Número INT NOT NULL,
-    data_inicial VARCHAR(20),
-    data_fim VARCHAR(20),
-    IDsprint INT NOT NULL,
-	fk_Product_Increment_PIID INT,
-		PRIMARY KEY(IDsprint),
-        FOREIGN KEY(fk_Product_Increment_PIID) REFERENCES agileDB.Product_Increment(PIID)
-);
-
-CREATE TABLE Backlog (
+CREATE TABLE agileDB.Backlog (
     backlogID INT NOT NULL,
     descricao TEXT,
     tipo VARCHAR(20),
@@ -80,7 +60,39 @@ CREATE TABLE Backlog (
          FOREIGN KEY(fk_Projeto_IDprojeto) REFERENCES agileDB.Projeto(IDprojeto)
 );
 
-CREATE TABLE IF NOT EXISTS Equipa (
+-- -------------------------------------------------------------------------------------
+-- Table `Product_Increment` - Tabela de um PI 
+-- -------------------------------------------------------------------------------------
+-- SELECT * FROM agileDB.Product_Increment;
+CREATE TABLE IF NOT EXISTS agileDB.Product_Increment (
+    PIID INT NOT NULL,
+    Título VARCHAR(30),
+    tempo_restante VARCHAR(30),
+    fk_Projeto_IDprojeto INT,
+		PRIMARY KEY(PIID),
+		FOREIGN KEY(fk_Projeto_IDprojeto) REFERENCES agileDB.Projeto(IDprojeto)
+);
+
+-- -------------------------------------------------------------------------------------
+-- Table `Sprint` - Tabela de um sprint 
+-- -------------------------------------------------------------------------------------
+-- SELECT * FROM agileDB.Sprint;
+CREATE TABLE IF NOT EXISTS agileDB.Sprint (
+    Número INT NOT NULL,
+    data_inicial VARCHAR(20),
+    data_fim VARCHAR(20),
+    IDsprint INT NOT NULL,
+	fk_Product_Increment_PIID INT,
+    fk_Backlog_backlogID INT,
+		PRIMARY KEY(IDsprint),
+        FOREIGN KEY(fk_Product_Increment_PIID) REFERENCES agileDB.Product_Increment(PIID),
+		FOREIGN KEY(fk_Backlog_backlogID) REFERENCES agileDB.Backlog(backlogID)
+);
+
+-- -------------------------------------------------------------------------------------
+-- Table `Equipa` - Tabela de uma equipa 
+-- -------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS agileDB.Equipa (
     EquipaId INT NOT NULL,
     fk_Projeto_IDprojeto INT,
     designacao VARCHAR(20),
@@ -88,7 +100,10 @@ CREATE TABLE IF NOT EXISTS Equipa (
         FOREIGN KEY(fk_Projeto_IDprojeto) REFERENCES agileDB.Projeto(IDprojeto)
 );
 
-CREATE TABLE IF NOT EXISTS Workpackage (
+-- -------------------------------------------------------------------------------------
+-- Table `Workpackage` - Tabela de um Workpackage 
+-- -------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS agileDB.Workpackage (
 	IDworkpackage INT NOT NULL,
     data_de_criacao VARCHAR(20),
     duracao VARCHAR(20),
@@ -99,10 +114,12 @@ CREATE TABLE IF NOT EXISTS Workpackage (
 		FOREIGN KEY(fk_Backlog_backlogID) REFERENCES agileDB.Backlog(backlogID)
 );
 
-    
-CREATE TABLE IF NOT EXISTS Tarefa (
+    -- -------------------------------------------------------------------------------------
+-- Table `Tarefa` - Tabela de uma Tarefa 
+-- -------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS agileDB.Tarefa (
     ID INT NOT NULL,
-    status VARCHAR(20),
+    Tstatus VARCHAR(20),
     descricao TEXT,
     fk_Workpackage_IDworkpackage INT,
     fk_Colaborador_IDcolab INT,
@@ -111,8 +128,10 @@ CREATE TABLE IF NOT EXISTS Tarefa (
         FOREIGN KEY(fk_Colaborador_IDcolab) REFERENCES agileDB.Colaborador(IDcolab)
 );
 
-
-CREATE TABLE IF NOT EXISTS Seccao_bug (
+-- -------------------------------------------------------------------------------------
+-- Table `Seccao_bug` - Tabela referente a secção de bugs 
+-- -------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS agileDB.Seccao_bug (
     Prioridade VARCHAR(20),
     codigo INT NOT NULL,
     descricao TEXT,
@@ -121,10 +140,12 @@ CREATE TABLE IF NOT EXISTS Seccao_bug (
         FOREIGN KEY(fk_Tarefa_ID) REFERENCES agileDB.Tarefa(ID)
 );
 
-CREATE TABLE IF NOT EXISTS EquipaEColaborador (
+-- -------------------------------------------------------------------------------------
+-- Table `EquipaEColaborador` - Tabela de EquipaEColaborador 
+-- -------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS agileDB.EquipaEColaborador (
     fk_Equipa_EquipaId INT,
     fk_Colaborador_IDcolab INT,
-		FOREIGN KEY(fk_Equipa_EquipaId) REFERENCES agileDB.Equipa_Workpackage(EquipaId),
+		FOREIGN KEY(fk_Equipa_EquipaId) REFERENCES agileDB.Equipa(EquipaId),
         FOREIGN KEY(fk_Colaborador_IDcolab) REFERENCES agileDB.Colaborador(IDcolab)
 );
-
